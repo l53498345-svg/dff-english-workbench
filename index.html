@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>英语教师工作台 V2</title>
+<style>
+:root{
+  --bg:#eef6fb;--panel:#f9fcff;--ink:#26384a;--muted:#7d91a5;--line:#d7e6f2;
+  --primary:#5b91bd;--primary-soft:#e3f0fa;--green:#6f9d8d;--green-soft:#e8f3ef;
+  --amber:#b78a56;--amber-soft:#f8efdf;--shadow:0 10px 28px rgba(70,112,145,.09);
+  --sidebar:#3d5f7a;--sidebarText:#edf6fc;--sidebarMuted:#bdd0df
+}
+body.dark{
+  --bg:#182632;--panel:#213342;--ink:#edf5fb;--muted:#a9bfce;--line:#30495c;
+  --primary:#8fc0e4;--primary-soft:#29485e;--green:#9bc2b4;--green-soft:#29463f;
+  --amber:#d4ad7f;--amber-soft:#4b3d2d;--shadow:0 10px 28px rgba(0,0,0,.22);
+  --sidebar:#12212c;--sidebarText:#eff7fc;--sidebarMuted:#91a9b9
+}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:flex}.sidebar{position:fixed;inset:0 auto 0 0;width:240px;background:var(--sidebar);color:var(--sidebarText);padding:18px 14px;overflow:auto}
+.brand{padding:6px 10px 18px}.brand strong{display:block;color:#fff;font-size:18px}.brand span{font-size:12px;color:var(--sidebarMuted)}
+.nav-title{font-size:11px;color:var(--sidebarMuted);padding:13px 10px 7px}.nav button{width:100%;display:flex;gap:10px;align-items:center;background:transparent;border:0;color:inherit;padding:10px 11px;border-radius:10px;text-align:left}.nav button:hover,.nav button.active{background:rgba(255,255,255,.10);color:white}
+.editable{border-radius:5px;padding:1px 2px;outline:none}.editable:hover{background:rgba(79,70,229,.08)}.sidebar .editable:hover{background:rgba(255,255,255,.08)}.editable[contenteditable=true]{background:#fff3be;color:#172033}
+.main{margin-left:240px;width:calc(100% - 240px);padding:22px 28px 50px}.top{display:flex;justify-content:space-between;gap:15px;margin-bottom:18px}.date-line{font-size:13px;color:#a0a6af;margin-bottom:7px}h1{margin:0;font-size:28px}.sub{font-size:12px;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--panel);padding:9px 13px;border-radius:10px;color:var(--ink)}.btn.primary{background:var(--primary);border-color:var(--primary);color:white}.btn.small{padding:7px 9px;font-size:12px}
+.grid{display:grid;grid-template-columns:1.55fr .75fr;gap:16px}.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow);padding:17px}
+.card-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.card h2{margin:0;font-size:16px}
+.schedule{display:grid;grid-template-columns:54px repeat(5,minmax(128px,1fr));border:1px solid var(--line);border-radius:14px;overflow:hidden}.cell{min-height:77px;padding:7px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel)}.cell:nth-child(6n){border-right:0}.headcell{min-height:42px;background:color-mix(in srgb,var(--panel) 88%,var(--bg));color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center}.period{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);background:color-mix(in srgb,var(--panel) 84%,var(--bg))}
+.lesson{padding:8px;border-radius:9px;background:var(--primary-soft);border-left:3px solid var(--primary);font-size:12px;transition:.15s}.lesson:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(79,70,229,.13)}.lesson.done{background:color-mix(in srgb,var(--panel) 72%,var(--bg));border-left-color:#a3aab3;color:#7c8591}.lesson.current{background:var(--green-soft);border-left-color:var(--green)}.lesson b{display:block}.lesson span{font-size:11px;color:#747d8a}.lesson.done span{color:#999fa8}
+.summary{display:grid;gap:10px}.metric{padding:13px;border:1px solid var(--line);border-radius:13px}.metric b{font-size:21px;display:block}.metric span{font-size:12px;color:var(--muted)}.alert{margin-top:10px;padding:11px;border-radius:11px;background:var(--amber-soft);color:#805a1a;font-size:12px}
+.course-panel{display:none;margin-top:16px}.course-panel.show{display:block}.course-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.chip{font-size:11px;padding:5px 8px;border-radius:999px;background:color-mix(in srgb,var(--panel) 75%,var(--bg))}.chip.ok{background:var(--green-soft);color:var(--green)}.chip.warn{background:var(--amber-soft);color:var(--amber)}
+.quality{margin-top:16px}.quality-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.chart{height:200px;border:1px solid var(--line);border-radius:14px;padding:12px}.bars{display:flex;align-items:flex-end;gap:11px;height:145px}.bar-group{flex:1;text-align:center}.bar{width:100%;background:var(--primary-soft);border-radius:7px 7px 2px 2px;position:relative}.bar:hover:after{content:attr(data-tip);position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 5px);white-space:nowrap;background:#111827;color:white;padding:5px 7px;border-radius:6px;font-size:11px}.bar-label{font-size:11px;color:var(--muted);margin-top:6px}
+.page{display:none}.page.active{display:block}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:11px;border-bottom:1px solid var(--line);text-align:left}.table th{font-size:11px;color:var(--muted)}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.42);display:none;justify-content:flex-end;z-index:50}.drawer-backdrop.show{display:flex}.drawer{width:min(760px,94vw);height:100%;background:var(--panel);padding:22px;overflow:auto}.drawer-head{display:flex;justify-content:space-between;align-items:center}.x{width:32px;height:32px;border-radius:50%;border:0;background:color-mix(in srgb,var(--panel) 72%,var(--bg))}
+.import-box{border:1.5px dashed #cbd1db;border-radius:14px;padding:18px;text-align:center;background:color-mix(in srgb,var(--panel) 88%,var(--bg))}.toolbox{display:flex;gap:8px;flex-wrap:wrap}.section-title{font-size:14px;margin:18px 0 9px}.history-item{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:10px;margin-top:8px}.history-item small{display:block;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.44);display:none;align-items:center;justify-content:center;padding:18px;z-index:60}.modal.show{display:flex}.modal-card{background:var(--panel);width:min(720px,96vw);border-radius:18px;padding:20px;max-height:90vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center}.upload{border:1.5px dashed #cbd1db;border-radius:12px;padding:16px;text-align:center;color:var(--muted);font-size:12px}
+.hidden{display:none}.toast{position:fixed;right:22px;bottom:22px;background:#111827;color:white;padding:11px 14px;border-radius:10px;font-size:12px;display:none;z-index:90}
+
+.student-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch}
+.student-card{perspective:1000px;height:285px;min-width:0}
+.student-grid>*{min-width:0}
+.student-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.student-card.is-flipped .student-inner{transform:rotateY(180deg)}
+.student-role{position:relative;z-index:5;cursor:text}
+.student-face{position:absolute;inset:0;backface-visibility:hidden;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px}
+.student-face.back{transform:rotateY(180deg)}
+.avatar-wrap{width:86px;height:86px;margin:4px auto 12px;border-radius:50%;padding:5px;border:3px solid #d8dce5;background:color-mix(in srgb,var(--panel) 88%,var(--bg))}
+.avatar-wrap.rep{border-color:#f0b429;box-shadow:0 0 0 4px rgba(240,180,41,.14)}
+.avatar{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;background:color-mix(in srgb,var(--panel) 70%,var(--bg));overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar-upload{display:block;text-align:center;margin-top:7px;font-size:11px;color:var(--primary);cursor:pointer}
+.student-name{text-align:center;font-weight:700;font-size:16px;margin-bottom:4px}
+.student-role{text-align:center;font-size:11px;color:var(--muted)}
+.student-role.rep{color:#9a6916;font-weight:700}
+.student-meta{margin-top:14px;display:grid;gap:8px}
+.student-meta-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.student-meta-row span:first-child{color:var(--muted)}
+.student-actions{display:flex;gap:7px;justify-content:center;margin-top:12px}
+.student-note{font-size:12px;line-height:1.55;color:#4d5664;background:color-mix(in srgb,var(--panel) 88%,var(--bg));border-radius:10px;padding:9px;margin-top:8px}
+
+.card{padding:18px;border-radius:16px}
+.card h2{font-size:16px;line-height:1.35}
+.btn{min-height:38px;padding:9px 13px;border-radius:10px}
+.btn.small{min-height:32px;padding:6px 10px;font-size:12px}
+.sub{font-size:12px;line-height:1.5}
+.metric{min-height:88px}
+.metric b{font-size:20px}
+.chip{min-height:26px;display:inline-flex;align-items:center}
+.student-face{padding:16px}
+.student-name{font-size:16px}
+.student-role{font-size:12px}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kpi-card b{display:block;font-size:22px;margin-top:4px}
+.delta-up{color:var(--green)}.delta-down{color:#b56a6a}
+.radar-wrap{display:flex;align-items:center;justify-content:center;min-height:260px}
+.radar-svg{width:min(320px,100%);height:auto}
+.report-box{margin-top:12px;padding:12px;border-radius:12px;background:var(--primary-soft);font-size:13px;line-height:1.65}
+
+.nav-tree{display:grid;gap:5px}
+.nav-node{position:relative}
+.nav-row{display:block}
+.nav-row>button[data-page],.nav-row>button[data-custom-page]{
+  width:100%;display:flex;align-items:center;gap:9px;background:transparent;border:0;color:inherit;
+  padding:10px 11px;border-radius:10px;text-align:left;transition:.15s
+}
+.nav-row>button[data-page]:hover,.nav-row>button[data-custom-page]:hover,
+.nav-row>button.active{background:rgba(255,255,255,.12);color:#fff}
+.nav-toggle{display:none!important}
+.nav-children{display:none;margin:4px 0 2px 14px;padding-left:0;border-left:0;gap:4px}
+.nav-node.has-children:hover > .nav-children{display:grid}
+.nav-node.has-children > .nav-row > button[data-page]::before,
+.nav-node.has-children > .nav-row > button[data-custom-page]::before{
+  content:"";width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;
+  border-left:6px solid currentColor;opacity:0;transform:translateX(-3px);transition:.15s
+}
+.nav-node.has-children:hover > .nav-row > button[data-page]::before,
+.nav-node.has-children:hover > .nav-row > button[data-custom-page]::before{opacity:.9;transform:translateX(0)}
+.nav-node .nav-node .nav-row>button[data-page],
+.nav-node .nav-node .nav-row>button[data-custom-page]{
+  font-size:12px;padding:8px 10px;background:rgba(255,255,255,.035)
+}
+.nav-node .nav-node .nav-row>button[data-page]:hover,
+.nav-node .nav-node .nav-row>button[data-custom-page]:hover{background:rgba(255,255,255,.10)}
+.context-menu{position:fixed;z-index:120;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:6px;display:none;min-width:176px}
+.context-menu.show{display:block}.context-menu button{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);padding:9px 10px;border-radius:7px}.context-menu button:hover{background:var(--primary-soft)}
+.builder-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.builder-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;grid-auto-flow:dense;align-items:start}
+.builder-item{grid-column:span 6;min-width:0;position:relative;cursor:grab}
+.builder-item.wide{grid-column:span 12}.builder-item.narrow{grid-column:span 4}
+.builder-item.dragging{opacity:.55;outline:2px dashed var(--primary)}
+.builder-handle{position:absolute;right:10px;top:8px;font-size:11px;color:var(--muted);user-select:none}
+.builder-item textarea,.builder-item input,.builder-item table{max-width:100%}
+.builder-item table{table-layout:fixed;word-break:break-word}
+.resource-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.resource-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel);min-width:0}
+.resource-card a{color:var(--primary);text-decoration:none;word-break:break-all}
+.page[hidden]{display:none!important}
+
+.resource-modal-backdrop{position:fixed;inset:0;background:rgba(23,45,62,.28);display:none;align-items:center;justify-content:center;z-index:500;padding:20px}
+.resource-modal-backdrop.show{display:flex}
+.resource-modal-panel{width:min(520px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px}
+.resource-modal-panel h2{margin:0 0 14px}
+.resource-form{display:grid;gap:12px}
+.resource-form label{display:grid;gap:6px;font-size:12px;color:var(--muted)}
+.resource-form input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:10px 12px;border-radius:10px}
+.resource-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.cloud-status{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.status-dot{width:9px;height:9px;border-radius:50%;background:#aab8c4;display:inline-block}
+.status-dot.ok{background:#70a58f}.status-dot.warn{background:#d0a46c}
+.cloud-path{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--primary-soft);word-break:break-all}
+.import-preview{max-height:260px;overflow:auto;margin-top:10px}
+.import-preview table{width:100%;table-layout:fixed}
+.import-preview th,.import-preview td{word-break:break-word}
+
+@media(max-width:900px){.builder-item,.builder-item.narrow{grid-column:span 12}}
+
+@media(max-width:1000px){.analytics-grid,.kpi-row{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.analytics-grid,.kpi-row{grid-template-columns:1fr}}
+
+@media(max-width:1000px){.grid,.quality-grid{grid-template-columns:1fr}.schedule{overflow:auto;grid-template-columns:54px repeat(5,150px)}}@media(max-width:720px){.sidebar{position:static;width:100%}.app{display:block}.main{margin-left:0;width:100%;padding:15px}.nav{display:flex;overflow:auto}.nav-title{display:none}.nav button{min-width:max-content}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">
+    <strong class="editable" data-editable>隆安县第一小学</strong>
+    <span class="editable" data-editable>英语教师工作台</span>
+  </div>
+  <div class="nav-title editable" data-editable>导航</div>
+  <div id="navTree" class="nav-tree">
+    <div class="nav-node open nav-depth-1" data-nav-id="workbench">
+      <div class="nav-row"><button class="active" data-page="dashboard">⌂ <span class="editable" data-editable>工作台</span></button></div>
+    </div>
+
+    <div class="nav-node open nav-depth-1" data-nav-id="teaching">
+      <div class="nav-row"><button data-page="calendar">▣ <span class="editable" data-editable>课程与课表</span></button></div>
+    </div>
+
+    <div class="nav-node open nav-depth-1" data-nav-id="students">
+      <div class="nav-row"><button data-page="classes">♙ <span class="editable" data-editable>班级与学生</span></button></div>
+      <div class="nav-children">
+        <div class="nav-node nav-depth-2" data-nav-id="learning-analysis">
+          <div class="nav-row"><button data-page="learningAnalysis">◈ <span class="editable" data-editable>学情分析</span></button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-node open nav-depth-1" data-nav-id="resources-root">
+      <div class="nav-row"><button data-page="resources">↗ <span class="editable" data-editable>教学资源</span></button></div>
+      <div class="nav-children">
+        <div class="nav-node nav-depth-2" data-nav-id="word-query"><div class="nav-row"><button data-page="resourceWords">⌕ <span class="editable" data-editable>单词查询</span></button></div></div>
+        <div class="nav-node nav-depth-2" data-nav-id="listen-speaking"><div class="nav-row"><button data-page="resourceAudio">♫ <span class="editable" data-editable>听力口语资源</span></button></div></div>
+      </div>
+    </div>
+
+    <div class="nav-node nav-depth-1" data-nav-id="ai-root"><div class="nav-row"><button data-page="ai">✦ <span class="editable" data-editable>AI 教学助理</span></button></div></div>
+    <div class="nav-node nav-depth-1" data-nav-id="settings-root"><div class="nav-row"><button data-page="settings">⚙ <span class="editable" data-editable>设置</span></button></div></div>
+  </div>
+</aside>
+
+<main class="main">
+<section class="page active" id="dashboard">
+  <div class="top">
+    <div>
+      <div id="todayLine" class="date-line">今天 · 日期 · 天气</div>
+      <h1 id="greeting">Good morning</h1>
+      <div class="sub editable" data-editable>四年级英语 · 四（5）—四（8）班</div>
+    </div>
+    <button class="btn primary" onclick="gotoPage('ai')">✦ AI 教学助理</button>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-head">
+      <div><h2>✦ AI 教学助理</h2><span class="sub">可直接询问学生表现、作业、测验、教学记录和待办提醒</span></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <input id="quickAiQuestion" class="btn" style="flex:1;text-align:left" placeholder="例如：四（五）班林悦最近的表现怎么样？">
+      <button class="btn primary" onclick="askTeachingAI()">提问</button>
+    </div>
+    <div id="quickAiAnswer" class="student-note" style="display:none;margin-top:10px"></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head">
+        <div><h2 class="editable" data-editable>我的英语课表</h2><div class="sub" id="weekText">当前周</div></div>
+        <div class="toolbox">
+          <select id="classFilter" class="btn small" onchange="renderSchedule()">
+            <option value="全部">全部班级</option><option>四（五）班</option><option>四（六）班</option><option>四（七）班</option><option>四（八）班</option>
+          </select>
+          <button class="btn small" onclick="openDrawer()">查看完整课表</button>
+        </div>
+      </div>
+      <div id="schedule" class="schedule"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2 class="editable" data-editable>今日概览</h2></div>
+      <div class="summary">
+        <div class="metric"><b id="todayCount">0</b><span class="editable" data-editable>今日英语课</span></div>
+        <div class="metric"><b>2</b><span class="editable" data-editable>近七天缺课件</span></div>
+        <div class="metric"><b>8</b><span class="editable" data-editable>待批改作业</span></div>
+      </div>
+      <div class="alert">AI 已检查未来 7 天课件准备情况，详细信息隐藏在 AI 助手中。</div>
+    </div>
+  </div>
+
+  <div id="coursePanel" class="card course-panel"></div>
+
+</section>
+
+<section class="page" id="calendar">
+  <div class="top"><div><div class="sub">主导航 / 我的课表</div><h1 class="editable" data-editable>完整课表</h1></div><button class="btn" onclick="openDrawer()">课表管理</button></div>
+  <div class="card"><div id="scheduleFull" class="schedule"></div></div>
+</section>
+
+<section class="page" id="plans">
+  <div class="top"><div><div class="sub">主导航 / 学年工作计划</div><h1 class="editable" data-editable>学年工作计划</h1></div><label class="btn">导入 Word<input class="hidden" type="file" accept=".doc,.docx" onchange="importData(this,'工作计划')"></label></div>
+  <div class="grid">
+    <div class="card">
+      <div class="editable" data-editable style="font-weight:700;margin-bottom:8px">2026—2027秋季学期</div>
+      <div class="editable" data-editable style="padding:8px">四（五）班</div><div class="editable" data-editable style="padding:8px">四（六）班</div><div class="editable" data-editable style="padding:8px">四（七）班</div><div class="editable" data-editable style="padding:8px">四（八）班</div>
+      <div class="editable" data-editable style="font-weight:700;margin:14px 0 8px">2026—2027春季学期</div>
+      <div class="editable" data-editable style="padding:8px">四（五）班</div><div class="editable" data-editable style="padding:8px">四（六）班</div><div class="editable" data-editable style="padding:8px">四（七）班</div><div class="editable" data-editable style="padding:8px">四（八）班</div>
+    </div>
+    <div class="card"><h2 class="editable" data-editable>四（五）班英语教学工作计划</h2><p class="sub">双击标题与字段即可重命名，内容可后续接入 Word 解析。</p></div>
+  </div>
+</section>
+
+<section class="page" id="classes">
+  <div class="top">
+    <div><div class="sub">班级与学生</div><h1 class="editable" data-editable>班级与学生</h1></div>
+    <div class="toolbox">
+      <label class="btn">导入花名册<input class="hidden" type="file" accept=".xlsx,.xls,.csv" onchange="importRoster(this)"></label>
+      <label class="btn">导入作业/测验数据<input class="hidden" type="file" accept=".xlsx,.xls,.csv" onchange="importData(this,'班级学情数据')"></label>
+      <label class="btn primary">上传给 AI 分析<input class="hidden" type="file" accept=".xlsx,.xls,.csv,.doc,.docx,.pdf" onchange="aiAnalyzeStudentData(this)"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="editable" data-editable>学生档案</h2>
+        <span class="sub">花名册导入后生成一人一档；作业与测验数据自动联动到学生档案。</span>
+      </div>
+      <div class="toolbox">
+        <select id="studentClassFilter" class="btn small" onchange="renderStudents();renderClassAnalytics()">
+          <option value="全部">全部班级</option>
+          <option>四（五）班</option><option>四（六）班</option><option>四（七）班</option><option>四（八）班</option>
+        </select>
+        <input id="studentSearch" class="btn small" style="width:150px" placeholder="搜索学生姓名" oninput="renderStudents()">
+      </div>
+    </div>
+    <div class="sub">学生类别遵循花名册导入内容，也支持双击自定义编辑；“课代表”类别头像边框高亮。</div>
+  </div>
+
+  <div id="studentGrid" class="student-grid" style="margin-top:16px"></div>
+<div class="card" style="margin-top:16px">
+    <div class="card-head">
+      <div><h2>云端花名册数据</h2><span class="sub">已按你提供的脱敏花名册格式预设字段：姓名、性别、学号。</span></div>
+      <span class="chip">四年级七班 · 40人</span>
+    </div>
+    <div class="import-preview">
+      <table class="table">
+        <thead><tr><th>姓名</th><th>性别</th><th>学号</th><th>云端档案</th></tr></thead>
+        <tbody id="rosterCloudPreview"></tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
+
+
+
+<section class="page" id="resources">
+  <div class="top"><div><div class="sub">教学资源</div><h1 class="editable" data-editable>教学资源</h1></div></div>
+  <div class="card">
+    <h2>资源导航</h2>
+    <p class="sub">可在左侧导航进入“单词查询”或“听力口语资源”。资源卡片支持自定义新增和删除。</p>
+  </div>
+</section>
+
+<section class="page" id="learningAnalysis">
+  <div class="top">
+    <div><div class="sub">班级与学生 / 学情分析</div><h1 class="editable" data-editable>学情分析</h1></div>
+    <div class="toolbox">
+      <select id="analysisClassFilter" class="btn small" onchange="syncAnalysisClass();renderClassAnalytics()">
+        <option value="全部">全部班级</option>
+        <option>四（五）班</option><option>四（六）班</option><option>四（七）班</option><option>四（八）班</option>
+      </select>
+      <label class="btn">导入测验数据<input class="hidden" type="file" accept=".xlsx,.xls,.csv" onchange="importData(this,'测验数据')"></label>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="card-head">
+      <div>
+        <h2 class="editable" data-editable>学情分析</h2>
+        <span class="sub">结合日常作业与测验，掌握班级整体学情。</span>
+      </div>
+      <button class="btn small" onclick="generateClassReport()">AI 生成学情报告</button>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card"><span class="sub">当前平均分</span><b id="avgScoreKpi">86.0</b><small id="avgClassLabel">全部班级</small></div>
+      <div class="kpi-card"><span class="sub">同比</span><b id="yoyKpi" class="delta-up">+3.2%</b><small>较上学年同期</small></div>
+      <div class="kpi-card"><span class="sub">环比</span><b id="momKpi" class="delta-up">+1.8%</b><small>较上一次测验</small></div>
+      <div class="kpi-card"><span class="sub">作业完成率</span><b id="homeworkKpi">89%</b><small>近四周</small></div>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="card" style="box-shadow:none">
+        <h2>班级平均分同比 / 环比</h2>
+        <table class="table">
+          <thead><tr><th>班级</th><th>当前平均分</th><th>同比</th><th>环比</th></tr></thead>
+          <tbody id="classScoreTable"></tbody>
+        </table>
+      </div>
+
+      <div class="card" style="box-shadow:none">
+        <h2>学情雷达图</h2>
+        <div class="radar-wrap">
+          <svg class="radar-svg" viewBox="0 0 320 300" aria-label="学情雷达图">
+            <polygon points="160,35 275,110 230,245 90,245 45,110" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+            <polygon points="160,75 235,124 206,212 114,212 85,124" fill="none" stroke="var(--line)" stroke-width="1"/>
+            <line x1="160" y1="150" x2="160" y2="35" stroke="var(--line)"/><line x1="160" y1="150" x2="275" y2="110" stroke="var(--line)"/>
+            <line x1="160" y1="150" x2="230" y2="245" stroke="var(--line)"/><line x1="160" y1="150" x2="90" y2="245" stroke="var(--line)"/>
+            <line x1="160" y1="150" x2="45" y2="110" stroke="var(--line)"/>
+            <polygon id="radarPolygon" points="160,58 253,118 214,222 112,215 68,118" fill="var(--primary-soft)" stroke="var(--primary)" stroke-width="3"/>
+            <text x="145" y="24" font-size="12" fill="var(--ink)">听力</text>
+            <text x="278" y="110" font-size="12" fill="var(--ink)">词汇</text>
+            <text x="225" y="270" font-size="12" fill="var(--ink)">阅读</text>
+            <text x="62" y="270" font-size="12" fill="var(--ink)">写作</text>
+            <text x="10" y="110" font-size="12" fill="var(--ink)">综合</text>
+          </svg>
+        </div>
+        <div id="radarLegend" class="sub" style="text-align:center">听力 88 · 词汇 84 · 阅读 82 · 写作 79</div>
+      </div>
+    </div>
+    <div id="classReport" class="report-box" style="display:none"></div>
+  </div>
+
+</section>
+<section class="page" id="resourceWords">
+  <div class="top"><div><div class="sub">教学资源 / 单词查询</div><h1 class="editable" data-editable>单词查询</h1></div><button type="button" class="btn primary resource-add-btn" data-resource-type="word">新增链接</button></div>
+  <div id="wordResources" class="resource-list"></div>
+</section>
+
+<section class="page" id="resourceAudio">
+  <div class="top"><div><div class="sub">教学资源 / 听力口语资源</div><h1 class="editable" data-editable>听力口语资源</h1></div><button type="button" class="btn primary resource-add-btn" data-resource-type="audio">新增链接</button></div>
+  <div id="audioResources" class="resource-list"></div>
+</section>
+
+<section class="page" id="customPage">
+  <div class="top">
+    <div><div class="sub">自定义页面</div><h1 id="customPageTitle" class="editable" data-editable>新页面</h1></div>
+  </div>
+  <div class="builder-toolbar">
+    <button class="btn" onclick="addBuilderItem('text')">+ 文本</button>
+    <button class="btn" onclick="addBuilderItem('card')">+ 卡片</button>
+    <button class="btn" onclick="addBuilderItem('table')">+ 表格</button>
+    <button class="btn" onclick="toggleBuilderWidth()">切换选中区块宽度</button>
+  </div>
+  <div id="builderGrid" class="builder-grid"></div>
+</section>
+
+<section class="page" id="ai">
+  <div class="top">
+    <div><div class="sub">AI 教学助理</div><h1 class="editable" data-editable>AI 教学助理</h1></div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <h2>自然语言提问</h2>
+      <p class="sub">AI 会结合学生近一段时间的作业、测验、教师评价和课堂记录进行综合分析。</p>
+      <textarea id="aiQuestion" class="btn" style="width:100%;height:110px;text-align:left;resize:vertical" placeholder="例如：四（五）班林悦最近的表现情况怎么样？"></textarea>
+      <button class="btn primary" style="margin-top:10px" onclick="askTeachingAI(true)">分析并回答</button>
+      <div id="aiAnswer" class="student-note" style="display:none;margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h2>主动提醒</h2>
+      <div class="history-item"><div><b>作业批改提醒</b><small>四（七）班有 8 份作业待批改</small></div><button class="btn small" onclick="toast('已记录为待办')">加入待办</button></div>
+      <div class="history-item"><div><b>教学记录提醒</b><small>今天有 2 节课尚未填写教学反思</small></div><button class="btn small" onclick="toast('已打开教学记录入口')">去记录</button></div>
+      <div class="history-item"><div><b>测验跟进提醒</b><small>四（八）班最近一次测验后建议补充学情评价</small></div><button class="btn small" onclick="toast('已记录提醒')">稍后处理</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="export"><div class="top"><div><div class="sub">主导航 / 数据导出</div><h1 class="editable" data-editable>数据导出</h1></div></div><div class="card"><p class="sub">后续支持按班级、学期、日期范围导出 Word / Excel / PDF。</p></div></section>
+<section class="page" id="settings">
+  <div class="top">
+    <div><div class="sub">系统设置</div><h1 class="editable" data-editable>设置</h1></div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <h2>外观</h2>
+      <div class="history-item">
+        <div><b>主题模式</b><small>奶油色浅色 / 深色模式</small></div>
+        <button id="themeToggle" class="btn small" onclick="toggleTheme()">切换深色模式</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>数据存储</h2>
+      <p class="sub">这里显示当前数据存储位置。原型中为本地路径配置项，正式部署后可绑定真实目录或数据库。</p>
+      <div style="display:flex;gap:8px">
+        <input id="storagePath" class="btn" style="flex:1;text-align:left" value="/dff-English/data">
+        <button class="btn" onclick="saveStoragePath()">保存</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>站点域名</h2>
+      <p class="sub">正式发布时需要在服务器 / DNS 中绑定。这里先作为站点域名配置与显示。</p>
+      <div style="display:flex;gap:8px">
+        <input id="domainName" class="btn" style="flex:1;text-align:left" value="https://dff-English.local">
+        <button class="btn" onclick="saveDomain()">保存</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>百度网盘云端存储</h2>
+      <p class="sub">工作台的数据目标保存到百度网盘中的 dff-English 专用目录。连接时使用百度官方授权，不需要在这里填写百度账号密码。</p>
+      <div class="cloud-status">
+        <span id="baiduStatusDot" class="status-dot warn"></span>
+        <b id="baiduStatusText">尚未连接百度网盘</b>
+      </div>
+      <div style="margin-top:12px">
+        <span class="sub">云端根目录</span>
+        <div id="baiduCloudPath" class="cloud-path">/dff-English/</div>
+      </div>
+      <div class="toolbox" style="margin-top:12px">
+        <button type="button" class="btn primary" onclick="connectBaiduCloud()">连接百度网盘</button>
+        <button type="button" class="btn" onclick="testBaiduCloud()">测试云端连接</button>
+        <button type="button" class="btn" onclick="showCloudStructure()">查看目录结构</button>
+      </div>
+      <div id="baiduCloudMessage" class="report-box" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <h2>版本与更新接口</h2>
+      <p class="sub">预留给后续指令优化和版本升级使用。正式部署后可将接口地址替换为真实 API。</p>
+      <div class="history-item">
+        <div><b>当前版本</b><small id="currentVersionText">V9.3</small></div>
+        <button type="button" class="btn small" onclick="checkWorkbenchUpdate()">检查更新</button>
+      </div>
+      <label class="sub" style="display:block;margin-top:10px">更新接口地址</label>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <input id="updateApiEndpoint" class="btn" style="flex:1;text-align:left" value="/api/dff-english/update">
+        <button type="button" class="btn" onclick="saveUpdateApiEndpoint()">保存</button>
+      </div>
+      <label class="sub" style="display:block;margin-top:10px">自定义优化指令</label>
+      <textarea id="upgradeInstruction" class="btn" style="width:100%;height:90px;text-align:left;resize:vertical;box-sizing:border-box" placeholder="例如：优化学生档案筛选逻辑；新增期中测验趋势图；调整 AI 学情报告格式。"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button type="button" class="btn primary" onclick="submitUpgradeInstruction()">提交到更新接口</button>
+      </div>
+      <div id="updateApiStatus" class="report-box" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <h2>数据与 AI</h2>
+      <p class="sub">AI 读取学生作业、测验和教学记录时，应按权限访问已导入的数据。</p>
+      <label class="btn primary">上传数据供 AI 分析<input class="hidden" type="file" multiple accept=".xlsx,.xls,.csv,.doc,.docx,.pdf" onchange="aiAnalyzeStudentData(this)"></label>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+
+<div id="drawerBackdrop" class="drawer-backdrop">
+  <div class="drawer">
+    <div class="drawer-head"><div><h2 class="editable" data-editable style="margin:0">完整课表与课表管理</h2><span class="sub">导入、历史课表和未来周次都收纳在这里</span></div><button class="x" onclick="closeDrawer()">×</button></div>
+    <div class="section-title editable" data-editable>课表导入</div>
+    <div class="import-box">
+      <p>分别导入四个班课表，正式版本将识别英语课程并合并成教师个人课表。</p>
+      <div class="toolbox" style="justify-content:center">
+        <label class="btn small">四（五）班<input class="hidden" type="file" onchange="importTimetable(this,'四（五）班')"></label>
+        <label class="btn small">四（六）班<input class="hidden" type="file" onchange="importTimetable(this,'四（六）班')"></label>
+        <label class="btn small">四（七）班<input class="hidden" type="file" onchange="importTimetable(this,'四（七）班')"></label>
+        <label class="btn small">四（八）班<input class="hidden" type="file" onchange="importTimetable(this,'四（八）班')"></label>
+      </div>
+    </div>
+    <div class="section-title editable" data-editable>按周查询</div>
+    <div class="toolbox">
+      <select id="weekSelect" class="btn small"></select><button class="btn small" onclick="jumpWeek()">跳转</button>
+    </div>
+    <div class="section-title editable" data-editable>历史课表</div>
+    <div id="historyList"></div>
+    <div class="section-title editable" data-editable>未来课表</div>
+    <div id="futureList"></div>
+  </div>
+</div>
+
+<div id="resourceModal" class="resource-modal-backdrop" aria-hidden="true">
+  <div class="resource-modal-panel" role="dialog" aria-modal="true" aria-labelledby="resourceModalTitle">
+    <h2 id="resourceModalTitle">新增链接</h2>
+    <div class="resource-form">
+      <label>资源名称
+        <input id="resourceNameInput" type="text" placeholder="例如：Oxford Learner's Dictionaries">
+      </label>
+      <label>网页链接
+        <input id="resourceUrlInput" type="url" placeholder="https://example.com">
+      </label>
+      <div class="resource-modal-actions">
+        <button type="button" class="btn" id="resourceCancelBtn">取消</button>
+        <button type="button" class="btn primary" id="resourceSaveBtn">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="navContextMenu" class="context-menu">
+  <button onclick="contextAddChild()">新建下一级导航栏</button>
+  <button onclick="contextRename()">重命名导航栏</button>
+  <button onclick="contextDelete()">删除导航栏</button>
+</div>
+<div id="modal" class="modal"><div class="modal-card"><div class="modal-head"><h2 id="modalTitle">课程</h2><button class="x" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const now=new Date();
+const weekdays=['周一','周二','周三','周四','周五'], periods=['第1节','第2节','第3节','第4节'];
+const schoolStart=new Date(2026,8,1);
+let lessons=[
+ {date:'2026-08-28',day:'周五',period:'第2节',cls:'四（五）班',unit:'Unit 1 · Review',material:true},
+ {date:'2026-08-31',day:'周一',period:'第1节',cls:'四（五）班',unit:'Unit 2 · Let’s learn',material:true},
+ {date:'2026-08-31',day:'周一',period:'第3节',cls:'四（七）班',unit:'Unit 2 · Let’s talk',material:false},
+ {date:'2026-09-01',day:'周二',period:'第2节',cls:'四（六）班',unit:'Unit 2 · Words',material:true},
+ {date:'2026-09-01',day:'周二',period:'第4节',cls:'四（八）班',unit:'Unit 2 · Reading',material:true},
+ {date:'2026-09-02',day:'周三',period:'第1节',cls:'四（五）班',unit:'Unit 2 · Let’s talk',material:true},
+ {date:'2026-09-02',day:'周三',period:'第3节',cls:'四（六）班',unit:'Unit 2 · Grammar',material:true},
+ {date:'2026-09-03',day:'周四',period:'第1节',cls:'四（八）班',unit:'Unit 3 · Let’s learn',material:false},
+ {date:'2026-09-03',day:'周四',period:'第3节',cls:'四（七）班',unit:'Unit 2 · Reading',material:true},
+ {date:'2026-09-04',day:'周五',period:'第2节',cls:'四（七）班',unit:'Unit 3 · Speaking',material:true},
+ {date:'2026-09-04',day:'周五',period:'第4节',cls:'四（五）班',unit:'Unit 3 · Review',material:true}
+];
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function monday(d){let x=new Date(d);let day=x.getDay()||7;x.setDate(x.getDate()-day+1);x.setHours(0,0,0,0);return x}
+let viewedMonday=monday(now);
+function weekNo(d){return Math.max(1,Math.floor((d-schoolStart)/(7*86400000))+1)}
+function fmt(d){return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`}
+function status(x){const t=iso(now);if(x.date<t)return'done';if(x.date===t)return'current';return'future'}
+function renderSchedule(id='schedule'){
+ const el=document.getElementById(id),filter=document.getElementById('classFilter')?.value||'全部';
+ let h='<div class="cell headcell">课次</div>';
+ for(let i=0;i<5;i++){let d=new Date(viewedMonday);d.setDate(d.getDate()+i);h+=`<div class="cell headcell">${weekdays[i]} · ${d.getMonth()+1}/${d.getDate()}</div>`}
+ periods.forEach(p=>{h+=`<div class="cell period">${p}</div>`;weekdays.forEach((day,i)=>{let d=new Date(viewedMonday);d.setDate(d.getDate()+i);let ds=iso(d);let ls=lessons.filter(x=>x.date===ds&&x.period===p&&(filter==='全部'||x.cls===filter));h+=`<div class="cell">${ls.map(x=>`<div class="lesson ${status(x)}" onclick='openCourse(${JSON.stringify(x)})'><b class="editable" data-editable>${x.cls}</b><span class="editable" data-editable>${x.unit}</span></div>`).join('')}</div>`})});
+ el.innerHTML=h;
+ document.getElementById('weekText').textContent=`第 ${weekNo(viewedMonday)} 周 · ${fmt(viewedMonday)} 起`;
+ bindEditable();
+}
+function openCourse(x){
+ const p=document.getElementById('coursePanel');p.classList.add('show');
+ p.innerHTML=`<div class="course-row"><div><div class="sub">${x.date} · ${x.day} · ${x.period}</div><h2 class="editable" data-editable>${x.cls} · ${x.unit}</h2><div class="chips"><span class="chip ok editable" data-editable>教学要求 ✓</span><span class="chip ${x.material?'ok':'warn'} editable" data-editable>教学课件 ${x.material?'✓':'⚠ 未上传'}</span><span class="chip ok editable" data-editable>作业布置 ✓</span><span class="chip editable" data-editable>教学反思 —</span></div></div><button class="btn primary" onclick="openLesson('${x.cls} · ${x.unit}')">进入课程</button></div>`;bindEditable();p.scrollIntoView({behavior:'smooth',block:'center'})
+}
+function openLesson(t){document.getElementById('modalTitle').textContent=t;document.getElementById('modalBody').innerHTML=`<div class="quality-grid"><div class="upload"><b class="editable" data-editable>教学要求</b><br>双击改名<br><label class="btn small" style="display:inline-block;margin-top:8px">导入<input class="hidden" type="file" onchange="importData(this,'教学要求')"></label></div><div class="upload"><b class="editable" data-editable>教学课件</b><br>Word / PPT / PDF / Excel<br><label class="btn small" style="display:inline-block;margin-top:8px">上传<input class="hidden" type="file" onchange="importData(this,'教学课件')"></label></div><div class="upload"><b class="editable" data-editable>作业布置</b><br>支持数据导入<br><label class="btn small" style="display:inline-block;margin-top:8px">导入<input class="hidden" type="file" onchange="importData(this,'作业')"></label></div><div class="upload"><b class="editable" data-editable>教学反思</b><br>文本 / Word / 数据<br><label class="btn small" style="display:inline-block;margin-top:8px">导入<input class="hidden" type="file" onchange="importData(this,'教学反思')"></label></div></div>`;document.getElementById('modal').classList.add('show');bindEditable()}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function bindEditable(){document.querySelectorAll('[data-editable]').forEach(el=>{if(el.dataset.bound)return;el.dataset.bound='1';el.title='双击编辑';el.ondblclick=e=>{e.stopPropagation();el.contentEditable='true';el.focus()};el.onblur=()=>{el.contentEditable='false';toast('已更新（原型）')};el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur()}}})}
+function gotoPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-row button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='calendar')renderSchedule('scheduleFull')}
+document.querySelectorAll('.nav-row button[data-page]').forEach(b=>b.onclick=()=>gotoPage(b.dataset.page));
+function openDrawer(){document.getElementById('drawerBackdrop').classList.add('show');renderHF()}
+function closeDrawer(){document.getElementById('drawerBackdrop').classList.remove('show')}
+function renderHF(){const t=iso(now);let h=lessons.filter(x=>x.date<t).sort((a,b)=>b.date.localeCompare(a.date));let f=lessons.filter(x=>x.date>=t).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('historyList').innerHTML=(h.length?h.slice(0,8).map(x=>`<div class="history-item"><div><b>${x.date} · ${x.cls}</b><small>${x.unit}</small></div><button class="btn small" onclick='openCourse(${JSON.stringify(x)});closeDrawer()'>查看</button></div>`).join(''):'<div class="sub">暂无历史课表</div>');document.getElementById('futureList').innerHTML=(f.length?f.slice(0,10).map(x=>`<div class="history-item"><div><b>${x.date} · ${x.cls}</b><small>${x.unit}</small></div><button class="btn small" onclick='openCourse(${JSON.stringify(x)});closeDrawer()'>查看</button></div>`).join(''):'<div class="sub">暂无未来课表</div>')}
+for(let i=1;i<=22;i++)document.getElementById('weekSelect').insertAdjacentHTML('beforeend',`<option value="${i}">第 ${i} 周</option>`);
+document.getElementById('weekSelect').value=weekNo(now);
+function jumpWeek(){let w=+document.getElementById('weekSelect').value;let d=monday(schoolStart);d.setDate(d.getDate()+(w-1)*7);viewedMonday=d;renderSchedule();renderSchedule('scheduleFull');closeDrawer();toast('已跳转至第 '+w+' 周')}
+function importTimetable(i,c){if(i.files.length)toast(`${c}课表已导入：${i.files[0].name}（原型中模拟识别英语课）`)}
+function importData(i,m){if(i.files.length)toast(`${m}已导入：${i.files[0].name}`)}
+function toast(s){let t=document.getElementById('toast');t.textContent=s;t.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>t.style.display='none',2200)}
+let hour=now.getHours();document.getElementById('greeting').textContent=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+document.getElementById('todayLine').textContent=`今天 · ${fmt(now)} · 天气：联网数据预留`;
+document.getElementById('todayCount').textContent=lessons.filter(x=>x.date===iso(now)).length;
+
+let students=[
+ {id:1,name:'林悦',gender:'女',cls:'四（五）班',role:'课代表',avatarUrl:'',homework:'最近作业：已完成，92分',test:'最近测验：88分',comment:'课堂参与积极，口语表达较好。'},
+ {id:2,name:'陈宇',gender:'男',cls:'四（五）班',role:'普通学生',avatarUrl:'',homework:'最近作业：已完成，85分',test:'最近测验：82分',comment:'词汇掌握稳定，需加强阅读速度。'},
+ {id:3,name:'黄可欣',gender:'女',cls:'四（六）班',role:'小组长',avatarUrl:'',homework:'最近作业：已完成，90分',test:'最近测验：91分',comment:'学习主动，合作意识较强。'},
+ {id:4,name:'周浩然',gender:'男',cls:'四（七）班',role:'普通学生',avatarUrl:'',homework:'最近作业：未完成订正',test:'最近测验：76分',comment:'需要关注作业订正与课堂专注。'},
+ {id:5,name:'李思妍',gender:'女',cls:'四（八）班',role:'课代表',avatarUrl:'',homework:'最近作业：已完成，96分',test:'最近测验：94分',comment:'表现稳定，可承担更多课堂协助任务。'},
+ {id:6,name:'赵子轩',gender:'男',cls:'四（八）班',role:'普通学生',avatarUrl:'',homework:'最近作业：已完成，81分',test:'最近测验：79分',comment:'基础较稳，建议加强句型迁移练习。'}
+];
+function defaultAvatar(gender){return gender==='女'?'👧':'👦'}
+function avatarHtml(s){
+ return s.avatarUrl ? `<img src="${s.avatarUrl}" alt="${s.name}头像">` : defaultAvatar(s.gender);
+}
+function renderStudents(){
+ const cls=document.getElementById('analysisClassFilter')?.value||document.getElementById('studentClassFilter')?.value||'全部';
+ const q=(document.getElementById('studentSearch')?.value||'').trim();
+ const list=students.filter(s=>(cls==='全部'||s.cls===cls)&&(!q||s.name.includes(q)));
+ const el=document.getElementById('studentGrid');
+ if(!el)return;
+ el.innerHTML=list.map(s=>`<div class="student-card">
+   <div class="student-inner">
+    <div class="student-face front">
+      <div class="avatar-wrap ${s.role==='课代表'?'rep':''}"><div class="avatar">${avatarHtml(s)}</div></div>
+      <label class="avatar-upload">自定义头像
+        <input class="hidden" type="file" accept="image/*" onchange="uploadStudentAvatar(this,${s.id})">
+      </label>
+      <div class="student-name editable" data-editable>${s.name}</div>
+      <div class="student-role no-flip ${s.role==='课代表'?'rep':''} editable" data-editable data-student-role="${s.id}">${s.role}</div>
+      <div class="student-meta">
+        <div class="student-meta-row"><span>性别</span><b class="editable" data-editable>${s.gender}</b></div>
+        <div class="student-meta-row"><span>班级</span><b class="editable" data-editable>${s.cls}</b></div>
+        <div class="student-meta-row"><span>档案编号</span><b>#${String(s.id).padStart(3,'0')}</b></div>
+      </div>
+      <div class="student-actions">
+        <span class="sub">双击类别可修改</span>
+      </div>
+    </div>
+    <div class="student-face back">
+      <h2 class="editable" data-editable style="margin-bottom:10px">${s.name} · 学习档案</h2>
+      <div class="student-meta-row"><span>性别</span><b>${s.gender}</b></div>
+      <div class="student-meta-row"><span>作业情况</span><b>${s.homework}</b></div>
+      <div class="student-meta-row"><span>测验情况</span><b>${s.test}</b></div>
+      <div class="sub" style="margin-top:10px">教师评价</div>
+      <div class="student-note editable" data-editable>${s.comment}</div>
+      <div class="student-actions">
+        <button class="btn small" onclick="openStudentArchive(${s.id})">查看完整档案</button>
+      </div>
+    </div>
+   </div>
+ </div>`).join('') || '<div class="card"><span class="sub">没有找到匹配的学生。</span></div>';
+ bindEditable();
+ bindStudentCardHover();
+ bindStudentRoleEditing();
+}
+function bindStudentCardHover(){
+ document.querySelectorAll('.student-card').forEach(card=>{
+   if(card.dataset.hoverBound)return;
+   card.dataset.hoverBound='1';
+   card.addEventListener('mouseenter',e=>{
+     if(e.target.closest('.no-flip')) return;
+     card.classList.add('is-flipped');
+   });
+   card.addEventListener('mousemove',e=>{
+     if(e.target.closest('.no-flip')) card.classList.remove('is-flipped');
+     else card.classList.add('is-flipped');
+   });
+   card.addEventListener('mouseleave',()=>card.classList.remove('is-flipped'));
+ });
+}
+function bindStudentRoleEditing(){
+ document.querySelectorAll('[data-student-role]').forEach(el=>{
+   if(el.dataset.roleSyncBound)return;
+   el.dataset.roleSyncBound='1';
+   el.addEventListener('blur',()=>{
+     const id=+el.dataset.studentRole;
+     const s=students.find(x=>x.id===id);
+     if(!s)return;
+     s.role=el.textContent.trim()||'未分类';
+     renderStudents();
+   });
+ });
+}
+function uploadStudentAvatar(input,id){
+ if(!input.files.length)return;
+ const file=input.files[0];
+ const s=students.find(x=>x.id===id); if(!s)return;
+ const reader=new FileReader();
+ reader.onload=e=>{s.avatarUrl=e.target.result;renderStudents();toast(`${s.name} 的头像已更新`)};
+ reader.readAsDataURL(file);
+}
+function setRole(id,role){
+ const s=students.find(x=>x.id===id); if(!s)return; s.role=role; renderStudents(); toast(`${s.name} 已设为 ${role}`);
+}
+function openStudentArchive(id){
+ const s=students.find(x=>x.id===id); if(!s)return;
+ document.getElementById('modalTitle').textContent=s.name+' · 一人一档';
+ document.getElementById('modalBody').innerHTML=`<div class="summary">
+   <div class="metric"><b>${s.cls}</b><span>所在班级</span></div>
+   <div class="metric"><b>${s.gender}</b><span>性别</span></div>
+   <div class="metric"><b>${s.role}</b><span>学生类别</span></div>
+ </div>
+ <div class="section-title">联动作业数据</div><div class="upload">${s.homework}</div>
+ <div class="section-title">联动测验数据</div><div class="upload">${s.test}</div>
+ <div class="section-title">教师评价</div><div class="student-note editable" data-editable>${s.comment}</div>
+ <div class="section-title">AI 分析入口</div>
+ <label class="btn primary">上传该生数据智能分析<input class="hidden" type="file" accept=".xlsx,.xls,.csv,.doc,.docx,.pdf" onchange="aiAnalyzeStudentData(this)"></label>`;
+ document.getElementById('modal').classList.add('show'); bindEditable();
+}
+function importRoster(input){
+ if(!input.files.length)return;
+ toast(`花名册已读取：${input.files[0].name}（正式版将同步导入姓名、性别、班级与类别）`);
+}
+function aiAnalyzeStudentData(input){
+ if(!input.files.length)return;
+ toast(`AI 已接收数据：${input.files[0].name}，正式版将生成学情分析`);
+}
+
+
+
+
+function toggleNode(e,btn){
+ e.stopPropagation();
+ const node=btn.closest('.nav-node');
+ if(!node)return;
+ node.classList.toggle('open');
+ btn.textContent=node.classList.contains('open')?'▾':'▸';
+}
+let contextNode=null;
+document.addEventListener('contextmenu',e=>{
+ const node=e.target.closest('.nav-node');
+ if(!node)return;
+ e.preventDefault();contextNode=node;
+ const m=document.getElementById('navContextMenu');
+ m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';m.classList.add('show');
+});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('#navContextMenu'))document.getElementById('navContextMenu')?.classList.remove('show');
+});
+function makeCustomNode(title,depth){
+ const id='custom-'+Date.now()+'-'+Math.random().toString(16).slice(2,6);
+ const node=document.createElement('div');
+ node.className=`nav-node nav-depth-${depth}`;
+ node.dataset.navId=id;
+ node.innerHTML=`<div class="nav-row"><button data-custom-page="${id}"><span class="editable" data-editable>${title}</span></button></div>${depth<3?'<div class="nav-children"></div>':''}`;
+ node.querySelector('[data-custom-page]').onclick=()=>openCustomPage(id,node.querySelector('[data-editable]').textContent);
+ return node;
+}
+function markNavParents(){
+ document.querySelectorAll('.nav-node').forEach(n=>{
+   const c=n.querySelector(':scope > .nav-children');
+   n.classList.toggle('has-children',!!(c&&c.children.length));
+ });
+}
+function contextAddChild(){
+ if(!contextNode)return;
+ const depth=+(contextNode.className.match(/nav-depth-(\d)/)?.[1]||1);
+ if(depth>=3){toast('最多支持三级导航');return}
+ let children=contextNode.querySelector(':scope > .nav-children');
+ if(!children){children=document.createElement('div');children.className='nav-children';contextNode.appendChild(children)}
+ children.appendChild(makeCustomNode('新建页面',depth+1));
+ bindEditable();markNavParents();
+ document.getElementById('navContextMenu').classList.remove('show');
+ toast('已新增下一级导航栏');
+}
+function contextRename(){
+ if(!contextNode)return;
+ const label=contextNode.querySelector(':scope > .nav-row [data-editable]');
+ if(!label)return;
+ const next=prompt('重命名导航栏：',label.textContent.trim());
+ if(next&&next.trim()){label.textContent=next.trim();toast('导航栏已重命名')}
+ document.getElementById('navContextMenu').classList.remove('show');
+}
+function contextDelete(){
+ if(!contextNode)return;
+ const fixed=['workbench','teaching','students','resources-root','ai-root','settings-root'];
+ if(fixed.includes(contextNode.dataset.navId)){toast('核心导航不可删除，可进行重命名');return}
+ contextNode.remove();markNavParents();
+ document.getElementById('navContextMenu').classList.remove('show');
+ toast('导航已删除');
+}
+function openCustomPage(id,title){
+ document.getElementById('customPageTitle').textContent=title||'自定义页面';
+ gotoPage('customPage');
+}
+function syncAnalysisClass(){
+ const a=document.getElementById('analysisClassFilter'),s=document.getElementById('studentClassFilter');
+ if(a&&s)s.value=a.value;
+}
+let resources={
+ word:[
+  {name:'网易有道词典',url:'https://dict.youdao.com/'},
+  {name:'Cambridge Dictionary',url:'https://dictionary.cambridge.org/'}
+ ],
+ audio:[
+  {name:'BBC Learning English',url:'https://www.bbc.co.uk/learningenglish'},
+  {name:'VOA Learning English',url:'https://learningenglish.voanews.com/'}
+ ]
+};
+function normalizeUrl(url){
+ url=(url||'').trim();
+ if(!url)return '';
+ if(!/^https?:\/\//i.test(url))url='https://'+url;
+ return url;
+}
+function saveResources(){
+ try{localStorage.setItem('dffResources',JSON.stringify(resources))}catch(e){}
+}
+function loadResources(){
+ try{
+   const saved=localStorage.getItem('dffResources');
+   if(saved){
+     const parsed=JSON.parse(saved);
+     if(parsed&&Array.isArray(parsed.word)&&Array.isArray(parsed.audio))resources=parsed;
+   }
+ }catch(e){}
+}
+function renderResources(){
+ for(const type of ['word','audio']){
+   const el=document.getElementById(type==='word'?'wordResources':'audioResources');
+   if(!el)continue;
+   const list=resources[type]||[];
+   el.innerHTML=list.length?list.map((r,i)=>`<div class="resource-card">
+     <h2>${escapeHtml(r.name)}</h2>
+     <a href="${escapeAttr(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.url)}</a>
+     <div class="student-actions">
+       <button type="button" class="btn small resource-edit-btn" data-resource-type="${type}" data-resource-index="${i}">编辑</button>
+       <button type="button" class="btn small resource-delete-btn" data-resource-type="${type}" data-resource-index="${i}">删除</button>
+     </div>
+   </div>`).join(''):'<div class="card"><span class="sub">暂无链接，点击右上角“新增链接”添加。</span></div>';
+ }
+}
+function escapeHtml(v){
+ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(v){return escapeHtml(v)}
+let resourceEditing={type:null,index:null};
+function openResourceModal(type,index=null){
+ resourceEditing={type,index};
+ const modal=document.getElementById('resourceModal');
+ const name=document.getElementById('resourceNameInput');
+ const url=document.getElementById('resourceUrlInput');
+ const title=document.getElementById('resourceModalTitle');
+ const editing=Number.isInteger(index);
+ const r=editing?resources[type]?.[index]:null;
+ title.textContent=editing?'编辑链接':'新增链接';
+ name.value=r?.name||'';
+ url.value=r?.url||'';
+ modal.classList.add('show');modal.setAttribute('aria-hidden','false');
+ setTimeout(()=>name.focus(),0);
+}
+function closeResourceModal(){
+ const modal=document.getElementById('resourceModal');
+ modal.classList.remove('show');modal.setAttribute('aria-hidden','true');
+ resourceEditing={type:null,index:null};
+}
+function saveResourceFromModal(){
+ const type=resourceEditing.type;
+ if(!type)return;
+ const name=document.getElementById('resourceNameInput').value.trim();
+ const url=normalizeUrl(document.getElementById('resourceUrlInput').value);
+ if(!name){toast('请输入资源名称');document.getElementById('resourceNameInput').focus();return}
+ if(!url){toast('请输入网页链接');document.getElementById('resourceUrlInput').focus();return}
+ if(!resources[type])resources[type]=[];
+ if(Number.isInteger(resourceEditing.index))resources[type][resourceEditing.index]={name,url};
+ else resources[type].push({name,url});
+ saveResources();renderResources();closeResourceModal();
+ toast(Number.isInteger(resourceEditing.index)?'链接已更新':'链接已新增');
+}
+function deleteResource(type,i){
+ if(!resources[type]?.[i])return;
+ const item=resources[type][i];
+ resources[type].splice(i,1);saveResources();renderResources();toast(`已删除：${item.name}`);
+}
+function bindResourceInteractions(){
+ document.addEventListener('click',e=>{
+   const add=e.target.closest('.resource-add-btn');
+   if(add){openResourceModal(add.dataset.resourceType);return}
+   const edit=e.target.closest('.resource-edit-btn');
+   if(edit){openResourceModal(edit.dataset.resourceType,Number(edit.dataset.resourceIndex));return}
+   const del=e.target.closest('.resource-delete-btn');
+   if(del){deleteResource(del.dataset.resourceType,Number(del.dataset.resourceIndex));return}
+ });
+ document.getElementById('resourceCancelBtn')?.addEventListener('click',closeResourceModal);
+ document.getElementById('resourceSaveBtn')?.addEventListener('click',saveResourceFromModal);
+ document.getElementById('resourceModal')?.addEventListener('click',e=>{if(e.target.id==='resourceModal')closeResourceModal()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeResourceModal()});
+}
+let selectedBuilder=null;
+function addBuilderItem(type){
+ const item=document.createElement('div');item.className='builder-item card';item.draggable=true;
+ if(type==='text')item.innerHTML='<span class="builder-handle">长按拖动</span><h2 class="editable" data-editable>文本区块</h2><div class="editable" data-editable style="min-height:90px;line-height:1.65">双击这里编辑文本内容。</div>';
+ if(type==='card')item.innerHTML='<span class="builder-handle">长按拖动</span><h2 class="editable" data-editable>卡片标题</h2><p class="editable" data-editable>这里可以放置课程、学生、提醒或其他自定义信息。</p>';
+ if(type==='table')item.innerHTML='<span class="builder-handle">长按拖动</span><h2 class="editable" data-editable>表格</h2><table class="table"><tr><th class="editable" data-editable>字段A</th><th class="editable" data-editable>字段B</th></tr><tr><td class="editable" data-editable>内容</td><td class="editable" data-editable>内容</td></tr></table>';
+ bindBuilderItem(item);document.getElementById('builderGrid').appendChild(item);bindEditable();
+}
+function bindBuilderItem(item){
+ item.onclick=()=>{selectedBuilder=item;document.querySelectorAll('.builder-item').forEach(x=>x.style.outline='');item.style.outline='2px solid var(--primary)'};
+ item.addEventListener('dragstart',()=>item.classList.add('dragging'));
+ item.addEventListener('dragend',()=>item.classList.remove('dragging'));
+ item.addEventListener('dragover',e=>e.preventDefault());
+ item.addEventListener('drop',e=>{
+   e.preventDefault();const drag=document.querySelector('.builder-item.dragging');
+   if(drag&&drag!==item){const grid=document.getElementById('builderGrid');const rect=item.getBoundingClientRect();grid.insertBefore(drag,e.clientY<rect.top+rect.height/2?item:item.nextSibling)}
+ });
+}
+function toggleBuilderWidth(){
+ if(!selectedBuilder){toast('请先点击一个区块');return}
+ if(selectedBuilder.classList.contains('wide')){selectedBuilder.classList.remove('wide');selectedBuilder.classList.add('narrow')}
+ else if(selectedBuilder.classList.contains('narrow'))selectedBuilder.classList.remove('narrow');
+ else selectedBuilder.classList.add('wide');
+}
+
+const classAnalytics={
+ '四（五）班':{avg:86,yoy:3.5,mom:2.1,homework:94,listen:90,vocab:86,read:84,write:81},
+ '四（六）班':{avg:83,yoy:1.8,mom:-0.6,homework:91,listen:84,vocab:82,read:80,write:78},
+ '四（七）班':{avg:89,yoy:4.2,mom:3.0,homework:83,listen:92,vocab:88,read:87,write:84},
+ '四（八）班':{avg:81,yoy:0.7,mom:1.2,homework:87,listen:82,vocab:80,read:77,write:74}
+};
+function selectedAnalytics(){
+ const cls=document.getElementById('studentClassFilter')?.value||'全部';
+ if(cls!=='全部')return {label:cls,...classAnalytics[cls]};
+ const vals=Object.values(classAnalytics),avg=k=>vals.reduce((a,b)=>a+b[k],0)/vals.length;
+ return {label:'全部班级',avg:avg('avg'),yoy:avg('yoy'),mom:avg('mom'),homework:avg('homework'),
+ listen:avg('listen'),vocab:avg('vocab'),read:avg('read'),write:avg('write')};
+}
+function radarPoint(value,angleDeg){
+ const c=160,cy=150,r=115*(value/100),a=(angleDeg-90)*Math.PI/180;
+ return [c+r*Math.cos(a),cy+r*Math.sin(a)];
+}
+function renderClassAnalytics(){
+ const a=selectedAnalytics();
+ const avg=document.getElementById('avgScoreKpi'); if(!avg)return;
+ avg.textContent=a.avg.toFixed(1);
+ document.getElementById('avgClassLabel').textContent=a.label;
+ const yoy=document.getElementById('yoyKpi');yoy.textContent=(a.yoy>=0?'+':'')+a.yoy.toFixed(1)+'%';yoy.className=a.yoy>=0?'delta-up':'delta-down';
+ const mom=document.getElementById('momKpi');mom.textContent=(a.mom>=0?'+':'')+a.mom.toFixed(1)+'%';mom.className=a.mom>=0?'delta-up':'delta-down';
+ document.getElementById('homeworkKpi').textContent=Math.round(a.homework)+'%';
+ const rows=Object.entries(classAnalytics).map(([k,v])=>`<tr><td>${k}</td><td>${v.avg}</td><td class="${v.yoy>=0?'delta-up':'delta-down'}">${v.yoy>=0?'+':''}${v.yoy}%</td><td class="${v.mom>=0?'delta-up':'delta-down'}">${v.mom>=0?'+':''}${v.mom}%</td></tr>`).join('');
+ document.getElementById('classScoreTable').innerHTML=rows;
+ const vals=[a.listen,a.vocab,a.read,a.write,(a.listen+a.vocab+a.read+a.write)/4];
+ const angles=[0,72,144,216,288];
+ document.getElementById('radarPolygon').setAttribute('points',vals.map((v,i)=>radarPoint(v,angles[i]).join(',')).join(' '));
+ document.getElementById('radarLegend').textContent=`听力 ${Math.round(a.listen)} · 词汇 ${Math.round(a.vocab)} · 阅读 ${Math.round(a.read)} · 写作 ${Math.round(a.write)}`;
+}
+function generateClassReport(){
+ const a=selectedAnalytics();
+ const weakest=[['听力',a.listen],['词汇',a.vocab],['阅读',a.read],['写作',a.write]].sort((x,y)=>x[1]-y[1])[0];
+ const trend=a.mom>=0?'呈上升趋势':'较上次测验有所回落';
+ const text=`${a.label}当前平均分为 ${a.avg.toFixed(1)} 分，同比 ${a.yoy>=0?'+':''}${a.yoy.toFixed(1)}%，环比 ${a.mom>=0?'+':''}${a.mom.toFixed(1)}%，整体${trend}。近四周作业完成率约 ${Math.round(a.homework)}%。听力、词汇、阅读、写作四项中，${weakest[0]}相对较弱（${Math.round(weakest[1])}），建议下一阶段增加针对性训练，并结合学生个人作业与测验档案识别需要重点跟进的学生。`;
+ const box=document.getElementById('classReport');box.textContent=text;box.style.display='block';
+}
+
+function askTeachingAI(full=false){
+ const src=full?document.getElementById('aiQuestion'):document.getElementById('quickAiQuestion');
+ const out=full?document.getElementById('aiAnswer'):document.getElementById('quickAiAnswer');
+ const q=(src?.value||'').trim();
+ if(!q){toast('请输入要查询的问题');return}
+ let found=students.find(s=>q.includes(s.name));
+ let foundClass=Object.keys(classAnalytics).find(c=>q.includes(c));
+ let answer='';
+ if(found){
+   const a=classAnalytics[found.cls];
+   const weak=[['听力',a.listen],['词汇',a.vocab],['阅读',a.read],['写作',a.write]].sort((x,y)=>x[1]-y[1])[0];
+   answer=`${found.name}（${found.cls}）近期表现综合分析：${found.homework}；${found.test}。教师已有评价为“${found.comment}”。同时参考所在班级当前平均分 ${a.avg} 分、环比 ${a.mom>=0?'+':''}${a.mom}% 以及学情雷达数据，班级相对薄弱项为${weak[0]}。建议结合该生最近两到三次作业与测验趋势，重点观察其在${weak[0]}相关任务中的稳定性，并安排有针对性的练习与课堂反馈。`;
+ }else if(foundClass){
+   const a=classAnalytics[foundClass];
+   const weak=[['听力',a.listen],['词汇',a.vocab],['阅读',a.read],['写作',a.write]].sort((x,y)=>x[1]-y[1])[0];
+   answer=`${foundClass}当前平均分 ${a.avg} 分，同比 ${a.yoy>=0?'+':''}${a.yoy}%，环比 ${a.mom>=0?'+':''}${a.mom}%，近四周作业完成率 ${a.homework}%。学情雷达显示${weak[0]}相对较弱，建议下一阶段围绕该项增加专项训练，并进一步筛查个人档案中连续两次表现偏弱的学生。`;
+ }else{
+   answer='已收到你的问题。正式版本会自动调用相关班级与学生近一段时间的作业、测验、班级同比/环比、学情雷达数据、课堂记录和教师评价后生成综合学情报告。';
+ }
+ out.textContent=answer;out.style.display='block';
+}
+function applyTheme(){
+ const mode=localStorage.getItem('dffTheme')||'light';
+ document.body.classList.toggle('dark',mode==='dark');
+ const b=document.getElementById('themeToggle');
+ if(b)b.textContent=mode==='dark'?'切换浅色模式':'切换深色模式';
+}
+function toggleTheme(){
+ const dark=document.body.classList.contains('dark');
+ localStorage.setItem('dffTheme',dark?'light':'dark');
+ applyTheme();
+}
+function saveStoragePath(){
+ localStorage.setItem('dffStoragePath',document.getElementById('storagePath').value);
+ toast('数据存储位置已保存');
+}
+function saveDomain(){
+ localStorage.setItem('dffDomain',document.getElementById('domainName').value);
+ toast('站点域名配置已保存');
+}
+function loadSettings(){
+ const p=localStorage.getItem('dffStoragePath'); if(p)document.getElementById('storagePath').value=p;
+ const d=localStorage.getItem('dffDomain'); if(d)document.getElementById('domainName').value=d;
+ applyTheme();
+}
+
+
+/* =========================================================
+   dff English Workbench - Version Update Interface
+   ---------------------------------------------------------
+   后续版本更新建议只扩展这一层，而不要直接耦合页面组件。
+   可替换 updateEndpoint 为真实服务器 API。
+   ========================================================= */
+
+const DFF_CLOUD = {
+  provider:'baidu-pan',
+  root:'/dff-English/',
+  connected:false,
+  appKey:localStorage.getItem('dffBaiduAppKey')||'',
+  accessToken:localStorage.getItem('dffBaiduAccessToken')||'',
+  folders:[
+    '班级与学生','作业','测验','课表','教学计划','教学课件','教学反思','AI学情报告','教学资源','系统设置','备份'
+  ],
+  get isConfigured(){return !!(this.appKey&&this.accessToken)},
+  pathFor(kind,name=''){return this.root+kind+(name?'/'+name:'')},
+  async upload(kind,file,meta={}){
+    if(!this.connected)throw new Error('百度网盘尚未完成授权连接');
+    // 正式接入点：这里将调用后端 /api/baidu-pan/upload，由后端安全持有授权令牌并上传文件。
+    return DFF_WORKBENCH_API.request('baidu-pan-upload',{kind,fileName:file?.name||'',meta});
+  },
+  async saveJson(kind,name,data){
+    if(!this.connected)throw new Error('百度网盘尚未完成授权连接');
+    return DFF_WORKBENCH_API.request('baidu-pan-save-json',{path:this.pathFor(kind,name),data});
+  }
+};
+function cloudMessage(text){
+ const box=document.getElementById('baiduCloudMessage');if(!box)return;
+ box.textContent=text;box.style.display='block';
+}
+function updateCloudStatus(){
+ const dot=document.getElementById('baiduStatusDot'),txt=document.getElementById('baiduStatusText');
+ if(!dot||!txt)return;
+ dot.classList.toggle('ok',DFF_CLOUD.connected);dot.classList.toggle('warn',!DFF_CLOUD.connected);
+ txt.textContent=DFF_CLOUD.connected?'百度网盘已连接':'尚未连接百度网盘';
+}
+function connectBaiduCloud(){
+ cloudMessage('百度网盘连接入口已经准备好。下一步需要创建百度网盘开放平台应用，取得官方授权所需的 App Key；授权完成后，工作台不会保存你的百度账号密码。');
+ toast('已进入百度网盘授权准备状态');
+}
+function testBaiduCloud(){
+ if(!DFF_CLOUD.connected){cloudMessage('当前还是开发预留状态：界面、目录结构和上传接口已经就绪，但还没有百度官方授权凭据，因此暂时不能真正写入你的网盘。');return}
+ cloudMessage('百度网盘连接正常。');
+}
+function showCloudStructure(){
+ cloudMessage('/dff-English/ → '+DFF_CLOUD.folders.join(' / '));
+}
+const DFF_ROSTER_SAMPLE=[["李同学01", "男", "407001"], ["王同学02", "女", "407002"], ["张同学03", "男", "407003"], ["刘同学04", "女", "407004"], ["陈同学05", "男", "407005"], ["杨同学06", "女", "407006"], ["赵同学07", "男", "407007"]];
+function renderRosterCloudPreview(){
+ const el=document.getElementById('rosterCloudPreview');if(!el)return;
+ el.innerHTML=DFF_ROSTER_SAMPLE.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="chip">待同步</span></td></tr>`).join('');
+}
+
+const DFF_WORKBENCH_API = {
+  appId: 'dff-English-teacher-workbench',
+  currentVersion: '9.3',
+  schemaVersion: '1.0',
+  get updateEndpoint(){
+    return localStorage.getItem('dffUpdateApiEndpoint') || '/api/dff-english/update';
+  },
+  async request(action,payload={}){
+    const packet={
+      appId:this.appId,
+      version:this.currentVersion,
+      schemaVersion:this.schemaVersion,
+      action,
+      payload,
+      clientTime:new Date().toISOString()
+    };
+
+    // 原型环境默认使用本地模拟接口，避免未部署 API 时发生报错。
+    if(this.updateEndpoint.startsWith('/api/')){
+      return {
+        ok:true,
+        simulated:true,
+        message:'更新接口已预留。部署真实后端后，可直接将该地址映射到版本服务。',
+        received:packet
+      };
+    }
+
+    const res=await fetch(this.updateEndpoint,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(packet)
+    });
+    if(!res.ok)throw new Error('Update API HTTP '+res.status);
+    return await res.json();
+  },
+  async checkUpdate(){
+    return this.request('check-update');
+  },
+  async submitInstruction(instruction){
+    return this.request('upgrade-instruction',{instruction});
+  }
+};
+
+function loadUpdateApiSettings(){
+  const ep=document.getElementById('updateApiEndpoint');
+  if(ep)ep.value=DFF_WORKBENCH_API.updateEndpoint;
+  const v=document.getElementById('currentVersionText');
+  if(v)v.textContent='V'+DFF_WORKBENCH_API.currentVersion;
+}
+function saveUpdateApiEndpoint(){
+  const el=document.getElementById('updateApiEndpoint');
+  const value=(el?.value||'').trim();
+  if(!value){toast('请输入更新接口地址');return}
+  localStorage.setItem('dffUpdateApiEndpoint',value);
+  toast('更新接口地址已保存');
+}
+function showUpdateStatus(text){
+  const box=document.getElementById('updateApiStatus');
+  if(!box)return;
+  box.textContent=text;
+  box.style.display='block';
+}
+async function checkWorkbenchUpdate(){
+  showUpdateStatus('正在检查版本接口…');
+  try{
+    const r=await DFF_WORKBENCH_API.checkUpdate();
+    showUpdateStatus(r.message || '版本接口响应正常。');
+  }catch(e){
+    showUpdateStatus('接口暂不可用：'+e.message);
+  }
+}
+async function submitUpgradeInstruction(){
+  const el=document.getElementById('upgradeInstruction');
+  const instruction=(el?.value||'').trim();
+  if(!instruction){toast('请输入需要优化的指令');return}
+  showUpdateStatus('正在提交更新指令…');
+  try{
+    const r=await DFF_WORKBENCH_API.submitInstruction(instruction);
+    showUpdateStatus(r.message || '更新指令已提交。');
+    localStorage.setItem('dffLastUpgradeInstruction',instruction);
+  }catch(e){
+    showUpdateStatus('提交失败：'+e.message);
+  }
+}
+
+renderSchedule();renderSchedule('scheduleFull');bindEditable();loadSettings();renderClassAnalytics();loadResources();renderResources();markNavParents();bindResourceInteractions();loadUpdateApiSettings();updateCloudStatus();renderRosterCloudPreview();
+renderStudents();
+</script>
+</body>
+</html>
