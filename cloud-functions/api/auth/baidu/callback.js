@@ -64,21 +64,11 @@ export default async function onRequest(context) {
     );
   }
 
-  if (!code) {
+  if (!code || !state) {
     return jsonResponse(
       {
         ok: false,
-        message: "Missing Baidu authorization code"
-      },
-      400
-    );
-  }
-
-  if (!state) {
-    return jsonResponse(
-      {
-        ok: false,
-        message: "Missing OAuth state"
+        message: "Missing authorization code or OAuth state"
       },
       400
     );
@@ -112,25 +102,18 @@ export default async function onRequest(context) {
   const payload = timestampText + "." + nonce;
 
   const timestamp = Number(timestampText);
-
-  if (!Number.isFinite(timestamp)) {
-    return jsonResponse(
-      {
-        ok: false,
-        message: "Invalid OAuth state timestamp"
-      },
-      400
-    );
-  }
-
   const maxAgeMs = 10 * 60 * 1000;
   const age = Date.now() - timestamp;
 
-  if (age < 0 || age > maxAgeMs) {
+  if (
+    !Number.isFinite(timestamp) ||
+    age < 0 ||
+    age > maxAgeMs
+  ) {
     return jsonResponse(
       {
         ok: false,
-        message: "OAuth state has expired"
+        message: "OAuth state has expired or is invalid"
       },
       400
     );
@@ -171,10 +154,84 @@ export default async function onRequest(context) {
     );
   }
 
+  const redirectUri =
+    "https://dffenglishworkbench.cn/api/auth/baidu/callback";
+
+  const tokenUrl = new URL(
+    "https://openapi.baidu.com/oauth/2.0/token"
+  );
+
+  tokenUrl.searchParams.set(
+    "grant_type",
+    "authorization_code"
+  );
+  tokenUrl.searchParams.set("code", code);
+  tokenUrl.searchParams.set("client_id", appKey);
+  tokenUrl.searchParams.set("client_secret", secretKey);
+  tokenUrl.searchParams.set("redirect_uri", redirectUri);
+
+  let tokenResponse;
+
+  try {
+    tokenResponse = await fetch(tokenUrl.toString(), {
+      method: "POST",
+      headers: {
+        Accept: "application/json"
+      }
+    });
+  } catch {
+    return jsonResponse(
+      {
+        ok: false,
+        stage: "token_exchange",
+        message: "Could not contact Baidu token service"
+      },
+      502
+    );
+  }
+
+  let tokenData;
+
+  try {
+    tokenData = await tokenResponse.json();
+  } catch {
+    return jsonResponse(
+      {
+        ok: false,
+        stage: "token_exchange",
+        message: "Invalid response from Baidu token service"
+      },
+      502
+    );
+  }
+
+  if (
+    !tokenResponse.ok ||
+    !tokenData.access_token ||
+    !tokenData.refresh_token
+  ) {
+    return jsonResponse(
+      {
+        ok: false,
+        stage: "token_exchange",
+        error: tokenData.error || "token_exchange_failed",
+        errorDescription:
+          tokenData.error_description || ""
+      },
+      400
+    );
+  }
+
+  // 故意不把 access_token / refresh_token 返回给浏览器。
+  // 下一步会把它们安全保存到服务器端存储。
+
   return jsonResponse({
     ok: true,
-    stage: "state_verified",
+    stage: "token_exchange_success",
+    accessTokenReceived: true,
+    refreshTokenReceived: true,
+    expiresIn: tokenData.expires_in || null,
     message:
-      "Baidu authorization callback and OAuth state were verified successfully. Token exchange is not enabled yet."
+      "Baidu tokens were received successfully and were not exposed to the browser."
   });
 }
