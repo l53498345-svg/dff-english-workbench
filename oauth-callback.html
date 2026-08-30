@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dff英语工作台｜百度网盘授权测试</title>
+<style>
+body{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:#f5f9ff;margin:0;color:#183153}
+.wrap{max-width:720px;margin:12vh auto;padding:24px}.card{background:#fff;border:1px solid #dbeafe;border-radius:18px;padding:32px;box-shadow:0 12px 40px rgba(30,64,175,.08)}
+h1{font-size:24px;margin:0 0 12px}.ok{color:#087f5b}.err{color:#c92a2a}.muted{color:#64748b}
+code{display:block;word-break:break-all;background:#f1f5f9;padding:14px;border-radius:10px;margin-top:14px}
+button{margin-top:14px;padding:10px 16px;border:0;border-radius:9px;background:#2563eb;color:#fff;cursor:pointer}
+</style>
+</head>
+<body><div class="wrap"><div class="card">
+<h1 id="title">正在检查百度网盘授权结果…</h1>
+<p id="message" class="muted">请稍候。</p>
+<code id="codeBox" hidden></code><button id="copyBtn" hidden>复制授权码</button>
+<p class="muted">安全提示：本页面只读取百度返回的临时授权结果，不包含 Secret Key。</p>
+</div></div>
+<script>
+const p=new URLSearchParams(location.search),code=p.get('code'),error=p.get('error'),desc=p.get('error_description');
+const title=document.getElementById('title'),message=document.getElementById('message'),box=document.getElementById('codeBox'),btn=document.getElementById('copyBtn');
+if(code){title.textContent='百度网盘授权返回成功';title.className='ok';message.textContent='已经收到临时 Authorization Code。下一步应由安全的服务器端函数使用它交换令牌。';box.textContent=code;box.hidden=false;btn.hidden=false;btn.onclick=async()=>{try{await navigator.clipboard.writeText(code);btn.textContent='已复制'}catch(e){btn.textContent='请手动复制上方授权码'}}}
+else if(error){title.textContent='百度网盘授权未完成';title.className='err';message.textContent=desc?error+': '+desc:error}
+else{title.textContent='OAuth 回调页面已部署';message.textContent='页面工作正常。目前没有收到授权参数；从百度 OAuth 授权流程返回到这里后，会显示测试结果。'}
+</script></body></html>
